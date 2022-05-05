@@ -68,9 +68,7 @@ pub mod ido {
         Ok(())
     }
 
-    // Currently debugging Transaction simulation failed: Error processing Instruction 0: Cross-program invocation with unauthorized signer or writable account
-
-    // #[access_control(CreateMember::accounts(&ctx, nonce))]
+    // Currently debugging: Transaction simulation failed: Error processing Instruction 0: Cross-program invocation with unauthorized signer or writable account
     pub fn create_lp(ctx: Context<CreateLP>, idx: u64) -> Result<()> {
         /*let lprovider = &mut ctx.accounts.lprovider;
         lprovider.deal_state = *ctx.accounts.deal_state.to_account_info().key;
@@ -81,12 +79,6 @@ pub mod ido {
         */
         Ok(())
     }
-   /* #[access_control(no_available_rewards(
-        &ctx.accounts.reward_event_q,
-        &ctx.accounts.member,
-        &ctx.accounts.balances,
-        &ctx.accounts.balances_locked,
-    ))]*/
     pub fn stake(ctx: Context<Stake>, token_amount: u64) -> Result<()> {
        
 

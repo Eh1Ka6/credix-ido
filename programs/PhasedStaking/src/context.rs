@@ -33,7 +33,7 @@ pub struct InitializeDeal<'info> {
     #[account(mut)]
     pub undertaker: Signer<'info>,                     // Alice
     // CHECK: no checks needed functionnal first secure after 
-   // pub lprovider: AccountInfo<'info>,                        // Charlie
+    // pub lprovider: AccountInfo<'info>,                        // Charlie
     /// CHECK: no checks needed functionnal first secure after 
     pub borrower: AccountInfo<'info>,                      // Bob
     pub mint_of_token_being_sent: Account<'info, Mint>,  // USDC
@@ -67,8 +67,8 @@ pub struct CreateLP<'info> {
     )]
     pub lprovider: Account<'info, LP>,
 
-    // PDA of the owner  TO DO: see if owner and lprovider_signer are not the same thing
-    #[account(mut)]
+    // Charlie PDA
+    #[account(mut)] // Transformed from owner to
     pub owner: Signer<'info>,
     pub system_program: Program<'info, System>,
     /// CHECK: nsafe for some reason
@@ -80,7 +80,11 @@ pub struct CreateLP<'info> {
 
 impl<'info> CreateLP<'info> {
     fn accounts(ctx: &Context<CreateLP>, nonce: u8) -> Result<()> {
-      /*  let seeds = &[
+
+        /* To be rewitten */ 
+   //    Define here the PDA Creation for owner and Lprovide Signer
+      /*  
+      let seeds = &[
             ctx.accounts.deal_state.to_account_info().key.as_ref(),
             ctx.accounts.lprovider.to_account_info().key.as_ref(),
             &[nonce],
@@ -91,7 +95,8 @@ impl<'info> CreateLP<'info> {
             //return Err(ErrorCode::InvalidMemberSigner.into());
             return Err(ErrorCode::InstructionMissing.into());
         }
-*/
+
+        */
         Ok(())
     }
 }
@@ -108,8 +113,6 @@ pub struct Stake<'info> {
         bump = wallet_bump,
     )]
     pub deal_wallet_state: Account<'info, TokenAccount>,
-
-
     #[account(mut)]
     /// CHECK: nsafe for some reason
     undertaker: AccountInfo<'info>,                     // Alice

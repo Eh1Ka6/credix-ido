@@ -2,18 +2,25 @@
 
 # credix-ido
 
-# Flow Chart 
-  [image]
+## 
+
+Solava version  1.7.8
+
+## Flow Chart 
+  ![Execution Flow](/assets/flow_chart.png?raw=true ")
 
 ## Test 
 
-anchor test 
+```Bash
 
-Initialize a deal (escrow wallet) OK
+	anchor test
 
-Create LP Member :  Cross-program invocation with unauthorized signer or writable account
-
-Stake : Todo 
+``` 
+```	
+	Initialize a deal (escrow wallet) OK
+	Create LP Member :  Cross-program invocation with unauthorized signer or writable account
+	Stake : To do
+```
 
 
 
