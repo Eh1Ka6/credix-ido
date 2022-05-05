@@ -25,7 +25,7 @@ pub struct DealState {
     pub idx: u64,
     
     // Alice 
-    pub undertaker: Pubkey,
+    pub underwriter: Pubkey,
 
     // Bob
     pub borrower: Pubkey,

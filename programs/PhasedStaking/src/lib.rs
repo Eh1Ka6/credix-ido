@@ -22,7 +22,7 @@ pub mod ido {
         // Set the state attributes
         let state = &mut ctx.accounts.deal_state;
         state.idx = application_idx;
-        state.undertaker = ctx.accounts.undertaker.key().clone();
+        state.underwriter= ctx.accounts.underwriter.key().clone();
         state.borrower = ctx.accounts.borrower.key().clone();
         state.mint_of_token_being_sent = ctx.accounts.mint_of_token_being_sent.key().clone();
         state.deal_wallet = ctx.accounts.deal_wallet_state.key().clone();
@@ -38,7 +38,7 @@ pub mod ido {
         let application_idx_bytes = application_idx.to_le_bytes();
         let dealStatePDA = vec![
             b"state".as_ref(),
-            ctx.accounts.undertaker.key.as_ref(),
+            ctx.accounts.underwriter.key.as_ref(),
             ctx.accounts.borrower.key.as_ref(),
             mint_of_token_being_sent_pk.as_ref(), 
             application_idx_bytes.as_ref(),
@@ -50,7 +50,7 @@ pub mod ido {
        let transfer_instruction = Transfer{
             from: ctx.accounts.wallet_to_withdraw_from.to_account_info(),
             to: ctx.accounts.deal_wallet_state.to_account_info(),
-            authority: ctx.accounts.undertaker.to_account_info(),
+            authority: ctx.accounts.underwriter.to_account_info(),
         };
         let cpi_ctx = CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),

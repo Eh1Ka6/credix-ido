@@ -13,16 +13,16 @@ pub struct InitializeDeal<'info> {
      // Derived PDAs
      #[account(
         init,
-        payer = undertaker,
-        seeds=[b"state".as_ref(), undertaker.key().as_ref(), borrower.key.as_ref(), mint_of_token_being_sent.key().as_ref(), application_idx.to_le_bytes().as_ref()],
+        payer = underwriter,
+        seeds=[b"state".as_ref(), underwriter.key().as_ref(), borrower.key.as_ref(), mint_of_token_being_sent.key().as_ref(), application_idx.to_le_bytes().as_ref()],
         bump,
         space=  8 + DealState::MAX_SIZE // 
     )]
     pub deal_state: Account<'info, DealState>, // puppet
     #[account(
         init,
-        payer = undertaker,
-        seeds=[b"wallet".as_ref(), undertaker.key().as_ref(),  borrower.key.as_ref(), mint_of_token_being_sent.key().as_ref(), application_idx.to_le_bytes().as_ref()],
+        payer = underwriter,
+        seeds=[b"wallet".as_ref(), underwriter.key().as_ref(),  borrower.key.as_ref(), mint_of_token_being_sent.key().as_ref(), application_idx.to_le_bytes().as_ref()],
         bump, //= wallet_bump,
         token::mint=mint_of_token_being_sent,
         token::authority=deal_state,
@@ -31,7 +31,7 @@ pub struct InitializeDeal<'info> {
 
     // Pda account of Alice 
     #[account(mut)]
-    pub undertaker: Signer<'info>,                     // Alice
+    pub underwriter: Signer<'info>,                     // Alice
     // CHECK: no checks needed functionnal first secure after 
     // pub lprovider: AccountInfo<'info>,                        // Charlie
     /// CHECK: no checks needed functionnal first secure after 
@@ -41,7 +41,7 @@ pub struct InitializeDeal<'info> {
     // Alice's USDC wallet that has already approved the escrow wallet
     #[account(
         mut,
-        constraint=wallet_to_withdraw_from.owner == undertaker.key(),
+        constraint=wallet_to_withdraw_from.owner == underwriter.key(),
         constraint=wallet_to_withdraw_from.mint == mint_of_token_being_sent.key()
     )]
     pub wallet_to_withdraw_from: Account<'info, TokenAccount>,
@@ -105,17 +105,17 @@ impl<'info> CreateLP<'info> {
 #[instruction(application_idx: u64, state_bump: u8, wallet_bump: u8)]
 pub struct Stake<'info> {
     // Global accounts for the staking instance.
-    #[account(has_one = undertaker, has_one = mint_of_token_being_sent)]
+    #[account(has_one = underwriter, has_one = mint_of_token_being_sent)]
     pub deal_state: Account<'info, DealState>,
     #[account(
         mut,
-        seeds=[b"wallet".as_ref(), undertaker.key().as_ref(), borrower.key.as_ref(), mint_of_token_being_sent.key().as_ref(), application_idx.to_le_bytes().as_ref()],
+        seeds=[b"wallet".as_ref(), underwriter.key().as_ref(), borrower.key.as_ref(), mint_of_token_being_sent.key().as_ref(), application_idx.to_le_bytes().as_ref()],
         bump = wallet_bump,
     )]
     pub deal_wallet_state: Account<'info, TokenAccount>,
     #[account(mut)]
     /// CHECK: nsafe for some reason
-    undertaker: AccountInfo<'info>,                     // Alice
+    underwriter: AccountInfo<'info>,                     // Alice
     #[account(mut)]
     borrower: Signer<'info>,                        // Bob
     mint_of_token_being_sent: Account<'info, Mint>,       // USDC
