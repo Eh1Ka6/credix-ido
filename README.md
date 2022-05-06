@@ -18,7 +18,7 @@ Solava version  1.10.10
 ``` 
 ```	
 	Initialize a deal (escrow wallet) OK
-	Create LP Member :  Cross-program invocation with unauthorized signer or writable account
+	Create LP Member :  OK
 	Stake : To do
 ```
 

@@ -81,7 +81,7 @@ pub struct CreateLP<'info> {
         payer= staker,
         seeds=[b"lprovider".as_ref(),deal_state.to_account_info().key.as_ref(),staker.key.as_ref(), application_idx.to_le_bytes().as_ref()],
         bump,
-        space= 8+ (4*32) +8 +8 +1 
+        space= 8 + LP::MAX_SIZE 
     )]
     pub lprovider: Account<'info, LP>,
 
@@ -122,7 +122,7 @@ pub struct Stake<'info> {
         
         #[account(
             mut,
-            seeds=[b"wallet".as_ref(), deal_underwriter.key().as_ref(), deal_borrower.key.as_ref(), deal_borrower.key().as_ref(), application_idx.to_le_bytes().as_ref()],
+            seeds=[b"wallet".as_ref(), deal_underwriter.key().as_ref(), deal_borrower.key.as_ref(), deal_mint.key().as_ref(), application_idx.to_le_bytes().as_ref()],
             bump = wallet_bump,
         )]
         pub deal_wallet: Account<'info, TokenAccount>,
@@ -133,7 +133,7 @@ pub struct Stake<'info> {
             payer= staker,
             seeds=[b"lprovider".as_ref(),deal_state.to_account_info().key.as_ref(),lprovider.key.as_ref(), application_idx.to_le_bytes().as_ref()],
             bump,
-            space= 8+ (4*32) +8 +8 +1 
+            space= 8 + LP::MAX_SIZE
         )]
         pub lprovider: Account<'info, LP>,
     
@@ -148,9 +148,7 @@ pub struct Stake<'info> {
         pub deal_mint:Account<'info,Mint>,
     
         pub system_program: Program<'info, System>,
-        /// CHECK: nsafe for some reason
-        /// PDA of the LP ACCOUNT to move the funds owned by the LP account
-        pub lprovider_state: Signer<'info>,
+        
         pub token_program: Program<'info, Token>,
         pub rent: Sysvar<'info, Rent>,
 }

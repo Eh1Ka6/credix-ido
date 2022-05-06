@@ -211,7 +211,7 @@ beforeEach(async () => {
 
   [charlie, charlieWallet] = await createUserAndAssociatedWallet(provider.connection,mintAddress);
   pda = await getPdaParameters(provider.connection, alice.publicKey, bob.publicKey, mintAddress);
-  pdaLP = await getLpPdaParameters(provider.connection, pda.dealWalletKey, charlie.publicKey);
+  pdaLP = await getLpPdaParameters(provider.connection, pda.stateKey, charlie.publicKey);
 });
 
 it('can initialize a safe payment by Alice', async () => {

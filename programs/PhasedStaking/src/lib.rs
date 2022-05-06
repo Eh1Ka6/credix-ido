@@ -69,16 +69,17 @@ pub mod ido {
     }
 
     // Currently debugging: Transaction simulation failed: Error processing Instruction 0: Cross-program invocation with unauthorized signer or writable account
-    pub fn create_lp(ctx: Context<CreateLP>, idx: u64,lp_bump: u8, _wallet_bump: u8) -> Result<()> {
+    pub fn create_lp(ctx: Context<CreateLP>, application_idx: u64, lp_bump: u8, wallet_bump: u8) -> Result<()> {
         
          // Set the state attributes
          let lpstate = &mut ctx.accounts.lprovider;
-        lpstate.idx= idx ;
+         lpstate.idx= application_idx ;
          lpstate.deal_underwriter= ctx.accounts.deal_underwriter.key().clone();
          lpstate.deal_borrower = ctx.accounts.deal_borrower.key().clone();
          lpstate.deal_mint = ctx.accounts.deal_mint.key().clone();
          lpstate.deal_wallet = ctx.accounts.deal_wallet.key().clone();
          lpstate.staker = ctx.accounts.staker.key().clone();
+         
          //lpstate.lprovider_state = ctx.accounts.lprovider_state.key().clone();
          //lpstate.balance = amount;
         

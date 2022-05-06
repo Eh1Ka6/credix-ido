@@ -46,7 +46,7 @@ pub struct DealState {
     pub epoch: u8,
 }
 impl DealState {
-    pub const MAX_SIZE:  usize = (5 * 32) + 8 + 8 + 1;
+    pub const MAX_SIZE:  usize = (4 * 32) + 8 + 8 + 1;
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -92,6 +92,9 @@ pub struct LP {
     /// Signer nonce for PDA derivation 
     pub idx: u64,
     
+}
+impl LP {
+    pub const MAX_SIZE:  usize = (7 * 32) + 8 + 8 + 8;
 }
 
 impl Epochs{
