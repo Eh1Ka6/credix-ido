@@ -4,7 +4,7 @@
 
 ## 
 
-Solava version  1.7.1
+Solava version  1.10.10
 
 ## Flow Chart 
   ![Execution Flow](/assets/flow_chart.png?raw=true "Execution Flow")

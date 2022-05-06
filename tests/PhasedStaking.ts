@@ -73,7 +73,7 @@ const program = new anchor.Program(idl, programId);
 
     }
 
-    // FIND an lprovider Account linked to the current deal
+    // FIND an lprovider Account linked to the current deal                // pda.dealkey                 // charlie key
     const getLpPdaParameters =  async (connection: anchor.web3.Connection, deal: anchor.web3.PublicKey, lprovider: anchor.web3.PublicKey) => {
       const uid = new anchor.BN(parseInt((Date.now() / 1000).toString()));
       const uidBuffer = uid.toBuffer('le', 8);
@@ -275,12 +275,15 @@ it('can initialize a safe payment by Alice', async () => {
   
     // DEBUG NOTE: The owner of  
   
-    const tx = await program.methods.createLp(pdaLP.idx).accounts({
+    const tx = await program.methods.createLp(pdaLP.idx,pdaLP.lpBump,pda.dealBump).accounts({
       dealState: pda.stateKey,
+      dealUnderwriter: alice.publicKey,
+      dealBorrower: bob.publicKey,
+      dealWallet: pda.dealWalletKey,
+      dealMint: mintAddress,
       lprovider: pdaLP.lproviderKey,
-      owner: charlie.publicKey,
+      staker: charlie.publicKey,
       systemProgram: anchor.web3.SystemProgram.programId,
-      lproviderSigner: alice.publicKey,
       tokenProgram:  spl.TOKEN_PROGRAM_ID,
       rent:anchor.web3.SYSVAR_RENT_PUBKEY,
     }).signers([charlie]).rpc();

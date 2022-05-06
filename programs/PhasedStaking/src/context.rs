@@ -53,95 +53,106 @@ pub struct InitializeDeal<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(application_idx: u64)]
+#[instruction(application_idx: u64, lp_bump: u8, wallet_bump: u8)]
 pub struct CreateLP<'info> {
     // Stake instance.
+    #[account(
+        mut, 
+        seeds=[b"state".as_ref(), deal_underwriter.key().as_ref(), deal_borrower.key.as_ref(), deal_mint.key().as_ref(), application_idx.to_le_bytes().as_ref()],
+        bump,
+        // find the write scope to  enforce 
+        //has_one = underwriter,
+        //has_one = borrower,
+        //has_one = mint_of_token_being_sent,
+    )]
     pub deal_state: Account<'info, DealState>,
+
+    
+    #[account(
+        mut,
+        seeds=[b"wallet".as_ref(), deal_underwriter.key().as_ref(), deal_borrower.key.as_ref(), deal_mint.key().as_ref(), application_idx.to_le_bytes().as_ref()],
+        bump = wallet_bump,
+    )]
+    pub deal_wallet: Account<'info, TokenAccount>,
+
     // Member.
     #[account(
         init, 
-        payer= owner,
-        seeds=[b"lprovider".as_ref(),deal_state.to_account_info().key.as_ref(),lprovider.key.as_ref(), application_idx.to_le_bytes().as_ref()],
+        payer= staker,
+        seeds=[b"lprovider".as_ref(),deal_state.to_account_info().key.as_ref(),staker.key.as_ref(), application_idx.to_le_bytes().as_ref()],
         bump,
-        space= 8+ (2*32) +8 +8 +1 
+        space= 8+ (4*32) +8 +8 +1 
     )]
     pub lprovider: Account<'info, LP>,
 
     // Charlie PDA
     #[account(mut)] // Transformed from owner to
-    pub owner: Signer<'info>,
+    pub staker: Signer<'info>,
+    /// CHECK. Only used to derive de dealstate
+    pub deal_underwriter: AccountInfo<'info>,
+    /// CHECK: Only used to derive dealstate
+    pub deal_borrower:AccountInfo<'info>,
+    /// CHECK: Only used to derive dealstate
+    pub deal_mint:Account<'info,Mint>,
+
     pub system_program: Program<'info, System>,
     /// CHECK: nsafe for some reason
-    /// PDA of the LP ACCOUNT 
-    pub lprovider_signer: Signer<'info>,
+    /// PDA of the LP ACCOUNT to move the funds owned by the LP account
+    //pub lprovider_state: Signer<'info>,
     pub token_program: Program<'info, Token>,
     pub rent: Sysvar<'info, Rent>,
 }
 
-impl<'info> CreateLP<'info> {
-    fn accounts(ctx: &Context<CreateLP>, nonce: u8) -> Result<()> {
-
-        /* To be rewitten */ 
-   //    Define here the PDA Creation for owner and Lprovide Signer
-      /*  
-      let seeds = &[
-            ctx.accounts.deal_state.to_account_info().key.as_ref(),
-            ctx.accounts.lprovider.to_account_info().key.as_ref(),
-            &[nonce],
-        ];
-        
-        let lprovider_signer = Pubkey::create_program_address(seeds, ctx.program_id).map_err(|_| ErrorCode::InstructionMissing)?;
-        if &lprovider_signer != ctx.accounts.lprovider_signer.to_account_info().key {
-            //return Err(ErrorCode::InvalidMemberSigner.into());
-            return Err(ErrorCode::InstructionMissing.into());
-        }
-
-        */
-        Ok(())
-    }
-}
 
 #[derive(Accounts)]
 #[instruction(application_idx: u64, state_bump: u8, wallet_bump: u8)]
 pub struct Stake<'info> {
-    // Global accounts for the staking instance.
-    #[account(has_one = underwriter, has_one = mint_of_token_being_sent)]
-    pub deal_state: Account<'info, DealState>,
-    #[account(
-        mut,
-        seeds=[b"wallet".as_ref(), underwriter.key().as_ref(), borrower.key.as_ref(), mint_of_token_being_sent.key().as_ref(), application_idx.to_le_bytes().as_ref()],
-        bump = wallet_bump,
-    )]
-    pub deal_wallet_state: Account<'info, TokenAccount>,
-    #[account(mut)]
-    /// CHECK: nsafe for some reason
-    underwriter: AccountInfo<'info>,                     // Alice
-    #[account(mut)]
-    borrower: Signer<'info>,                        // Bob
-    mint_of_token_being_sent: Account<'info, Mint>,       // USDC
-    //deal_wallet_state: Account<'info, TokenAccount>,
-    // Member.
-    #[account(mut, has_one = owner, has_one = deal_state)]
-    pub lprovider: Account<'info, LP>,
-    #[account(signer)]
-    /// CHECK: nsafe for some reason
-    pub owner: AccountInfo<'info>,
-
-    // Program signers.
-    #[account(
-        seeds = [
-            deal_state.to_account_info().key.as_ref(),
-            lprovider.to_account_info().key.as_ref(),
-            application_idx.to_le_bytes().as_ref(),
-        ],
-        bump = state_bump
-    )]
-    /// CHECK: nsafe for some reason
-    pub lprovider_signer: AccountInfo<'info>,
-    #[account(seeds = [deal_state.to_account_info().key.as_ref(), application_idx.to_le_bytes().as_ref()],bump = state_bump)]
-    /// CHECK: nsafe for some reason
-    deal_state_signer: AccountInfo<'info>,
-    pub token_program: Program<'info, Token>,
+        // Stake instance.
+        #[account(
+            mut, 
+            seeds=[b"state".as_ref(), deal_underwriter.key().as_ref(), deal_borrower.key.as_ref(), deal_mint.key().as_ref(), application_idx.to_le_bytes().as_ref()],
+            bump,
+            // find the write scope to  enforce 
+            //has_one = underwriter,
+            //has_one = borrower,
+            //has_one = mint_of_token_being_sent,
+        )]
+        pub deal_state: Account<'info, DealState>,
+    
+        
+        #[account(
+            mut,
+            seeds=[b"wallet".as_ref(), deal_underwriter.key().as_ref(), deal_borrower.key.as_ref(), deal_borrower.key().as_ref(), application_idx.to_le_bytes().as_ref()],
+            bump = wallet_bump,
+        )]
+        pub deal_wallet: Account<'info, TokenAccount>,
+    
+        // Member.
+        #[account(
+            init, 
+            payer= staker,
+            seeds=[b"lprovider".as_ref(),deal_state.to_account_info().key.as_ref(),lprovider.key.as_ref(), application_idx.to_le_bytes().as_ref()],
+            bump,
+            space= 8+ (4*32) +8 +8 +1 
+        )]
+        pub lprovider: Account<'info, LP>,
+    
+        // Charlie PDA
+        #[account(mut)] // Transformed from owner to
+        pub staker: Signer<'info>,
+        /// CHECK. Only used to derive de dealstate
+        pub deal_underwriter: AccountInfo<'info>,
+        /// CHECK: Only used to derive dealstate
+        pub deal_borrower:AccountInfo<'info>,
+        /// CHECK: Only used to derive dealstate
+        pub deal_mint:Account<'info,Mint>,
+    
+        pub system_program: Program<'info, System>,
+        /// CHECK: nsafe for some reason
+        /// PDA of the LP ACCOUNT to move the funds owned by the LP account
+        pub lprovider_state: Signer<'info>,
+        pub token_program: Program<'info, Token>,
+        pub rent: Sysvar<'info, Rent>,
 }
 
 

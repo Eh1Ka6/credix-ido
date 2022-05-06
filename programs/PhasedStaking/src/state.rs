@@ -73,8 +73,19 @@ pub struct LP {
     // The deal the user belong to 
     pub deal_state: Pubkey,
     // the owner of the lprovider account : Charlie
-    pub owner: Pubkey,
+    pub deal_underwriter: Pubkey,
+
+    pub deal_borrower:Pubkey,
+
+    pub deal_wallet: Pubkey,
+    pub deal_mint:Pubkey,
+    //LP Account 
+    pub lprovider:Pubkey,
     // Balance owned by the member
+    
+    // Charlie Account
+    pub staker: Pubkey,
+
     pub balance:u64,
 
     pub last_stake_ts: i64,
