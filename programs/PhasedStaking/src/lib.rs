@@ -69,16 +69,19 @@ pub mod ido {
     }
 
     // Currently debugging: Transaction simulation failed: Error processing Instruction 0: Cross-program invocation with unauthorized signer or writable account
-    pub fn create_lp(ctx: Context<CreateLP>, application_idx: u64, lp_bump: u8, wallet_bump: u8) -> Result<()> {
+    pub fn create_lp(ctx: Context<CreateLP>, application_idx: u64, lp_bump: u8, state_bump:u8 , wallet_bump: u8) -> Result<()> {
         
+        msg!("Initialized new Member instance for {}", ctx.accounts.staker.key().clone());
+
          // Set the state attributes
          let lpstate = &mut ctx.accounts.lprovider;
          lpstate.idx= application_idx ;
-         lpstate.deal_underwriter= ctx.accounts.deal_underwriter.key().clone();
-         lpstate.deal_borrower = ctx.accounts.deal_borrower.key().clone();
-         lpstate.deal_mint = ctx.accounts.deal_mint.key().clone();
+         lpstate.deal_mint = ctx.accounts.mint_of_token_being_sent.key().clone();
          lpstate.deal_wallet = ctx.accounts.deal_wallet.key().clone();
+         lpstate.deal_state = ctx.accounts.deal_state.key().clone();
          lpstate.staker = ctx.accounts.staker.key().clone();
+         
+         
          
          //lpstate.lprovider_state = ctx.accounts.lprovider_state.key().clone();
          //lpstate.balance = amount;
@@ -92,38 +95,43 @@ pub mod ido {
         */
         Ok(())
     }
-    /*pub fn stake(ctx: Context<Stake>, token_amount: u64) -> Result<()> {
+    pub fn stake(ctx: Context<Stake>, application_idx: u64, lp_bump: u8, state_bump:u8 ,wallet_bump: u8,  amount: u64) -> Result<()> {
        
-
+        msg!("trying to transfer");
         // See Serum stake doc to integrate Deposit and stake 
         // Transfer tokens into the Deal Wallet.
-        
-        {
-             // Derives the adresse of lprovider_signer that owns the LP Data Account and ATA 
-            let seeds = &[
-                // registrar 
+            let lpstate = &mut ctx.accounts.lprovider;
+            
+            lpstate.balance = amount;
+            let bump_vector = lp_bump.to_le_bytes();
+            let application_idx_bytes = application_idx.to_le_bytes();
+            let lpPDA = vec![
+                b"lprovider".as_ref(),
                 ctx.accounts.deal_state.to_account_info().key.as_ref(),
-                //member (LP Account)
-                ctx.accounts.lprovider.to_account_info().key.as_ref(),
-                //nonce
-                &[ctx.accounts.lprovider.idx.try_into().unwrap()],
+                ctx.accounts.staker.key.as_ref(), 
+                application_idx_bytes.as_ref(),
+                bump_vector.as_ref(),
             ];
-            let lprovider_signer = &[&seeds[..]];
+
+           
+            let outer = vec![lpPDA.as_slice()];
+            
             let cpi_ctx = CpiContext::new_with_signer(
                 ctx.accounts.token_program.to_account_info(),
                 Transfer {
                     // TO DO : Convert Owner Pubkey to lprovider_signer ATA  
-                    from: ctx.accounts.owner.to_account_info(),
+                    from: ctx.accounts.staker_wallet.to_account_info(),
                     // TO DO : Review Access to  dealState ATA wallet 
-                    to: ctx.accounts.deal_wallet_state.to_account_info(),
-                    authority: ctx.accounts.lprovider_signer.to_account_info(),
+                    to: ctx.accounts.deal_wallet.to_account_info(),
+                    authority: ctx.accounts.staker.to_account_info(),
                 },
                 // CPI call signed with the PDA of LP Account .  
-                lprovider_signer,
+                outer.as_slice(),
             );
-           
-            anchor_spl::token::transfer(cpi_ctx, token_amount)?;
-        }*/
+          
+            anchor_spl::token::transfer(cpi_ctx, amount)?; 
+            Ok(())
+        }
 
         // Mint the CREDIX LP tokens to the staker.
        /*{

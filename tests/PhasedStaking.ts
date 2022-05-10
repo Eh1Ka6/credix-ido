@@ -176,9 +176,7 @@ const program = new anchor.Program(idl, programId);
         const txFundTokenSig = await provider.sendAll([txandsigner]);
         console.log(`[${userAssociatedTokenAccount.toBase58()}] New associated account for mint ${mint.toBase58()}: ${txFundTokenSig}`);
     }
-    return [user, userAssociatedTokenAccount];
-
-    
+    return [user, userAssociatedTokenAccount];    
 }
 const readAccount = async (accountPublicKey: anchor.web3.PublicKey, provider: anchor.Provider): Promise<[spl.RawAccount, string]> => {
   const tokenInfoLol = await provider.connection.getAccountInfo(accountPublicKey);
@@ -245,8 +243,10 @@ it('can initialize a safe payment by Alice', async () => {
   assert.equal(DealBalancePost, '20000000');
 
   const state = await program.account.dealState.fetch(pda.stateKey);
+  console.log(state);
   assert.equal(state.amountTokens.toString(), '20000000');
   assert.equal(state.epoch.toString(), '1');
+  
 })
 
 
@@ -275,19 +275,43 @@ it('can initialize a safe payment by Alice', async () => {
   
     // DEBUG NOTE: The owner of  
   
-    const tx = await program.methods.createLp(pdaLP.idx,pdaLP.lpBump,pda.dealBump).accounts({
+    const tx = await program.methods.createLp(pdaLP.idx,pdaLP.lpBump,pda.stateBump,pda.dealBump).accounts({
       dealState: pda.stateKey,
-      dealUnderwriter: alice.publicKey,
-      dealBorrower: bob.publicKey,
+      underwriter: alice.publicKey,
+      borrower: bob.publicKey,
       dealWallet: pda.dealWalletKey,
-      dealMint: mintAddress,
+      mintOfTokenBeingSent: mintAddress,
       lprovider: pdaLP.lproviderKey,
       staker: charlie.publicKey,
       systemProgram: anchor.web3.SystemProgram.programId,
       tokenProgram:  spl.TOKEN_PROGRAM_ID,
       rent:anchor.web3.SYSVAR_RENT_PUBKEY,
     }).signers([charlie]).rpc();
-      
-    console.log(tx)
+    
+    const statedeal = await program.account.dealState.fetch(pda.stateKey);
+   //console.log(statedeal);
+    const state = await program.account.liqProvider.fetch(pdaLP.lproviderKey);
+   // Deal State is associated to liqProvider
+   assert.equal(state.dealWallet._bn.toString(), statedeal.dealWallet._bn.toString());
+   console.log(`Member added to the deal`);
+    const tx2 = await program.methods.stake(pdaLP.idx,pdaLP.lpBump,pda.stateBump,pda.dealBump,amount).accounts({
+      dealState: pda.stateKey,
+     underwriter: alice.publicKey,
+      borrower: bob.publicKey,
+      dealWallet: pda.dealWalletKey,
+      mintOfTokenBeingSent: mintAddress,
+      lprovider: pdaLP.lproviderKey,
+      staker: charlie.publicKey,
+      stakerWallet: charlieWallet,
+      systemProgram: anchor.web3.SystemProgram.programId,
+      tokenProgram:  spl.TOKEN_PROGRAM_ID,
+      rent:anchor.web3.SYSVAR_RENT_PUBKEY,
+    }).signers([charlie]).rpc();
 
+  console.log(`Charlie is staking 20 tokens in alice escrow wallet`);
+  const [, charlieBalancePost] = await readAccount(charlieWallet, provider);
+  assert.equal(charlieBalancePost, '1317000000');
+  const [, DealBalancePost] = await readAccount(pda.dealWalletKey, provider);
+  assert.equal(DealBalancePost, '40000000');
+ 
   });

@@ -38,7 +38,6 @@ pub struct DealState {
 
     // The Deal wallet 
     pub deal_wallet: Pubkey,
-
     // The amount of tokens Alice wants to place in the deal
     pub amount_tokens: u64,
 
@@ -69,23 +68,20 @@ pub enum Epochs {
 
 
 #[account]
-pub struct LP {
+#[derive(Default)]
+pub struct LiqProvider {
     // The deal the user belong to 
     pub deal_state: Pubkey,
-    // the owner of the lprovider account : Charlie
-    pub deal_underwriter: Pubkey,
-
-    pub deal_borrower:Pubkey,
+   
 
     pub deal_wallet: Pubkey,
     pub deal_mint:Pubkey,
-    //LP Account 
-    pub lprovider:Pubkey,
+   
     // Balance owned by the member
     
     // Charlie Account
     pub staker: Pubkey,
-
+    //pub staker_wallet: Pubkey,
     pub balance:u64,
 
     pub last_stake_ts: i64,
@@ -93,8 +89,8 @@ pub struct LP {
     pub idx: u64,
     
 }
-impl LP {
-    pub const MAX_SIZE:  usize = (7 * 32) + 8 + 8 + 8;
+impl LiqProvider {
+    pub const MAX_SIZE:  usize = (4 * 32) + 8 + 8 + 8;
 }
 
 impl Epochs{
