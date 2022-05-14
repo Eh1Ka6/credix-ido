@@ -15,7 +15,10 @@ pub enum ErrorCode {
     InvalidMemberSigner,
     #[msg("The nonce given doesn't derive a valid program address.")]
     InvalidNonce,
+    #[msg("Overfund")]
+    Overfund,
 }
+
 // 1 State account instance == 1 Safe Pay instance
 #[account]
 #[derive(Default)]
@@ -38,14 +41,23 @@ pub struct DealState {
 
     // The Deal wallet 
     pub deal_wallet: Pubkey,
-    // The amount of tokens Alice wants to place in the deal
-    pub amount_tokens: u64,
 
+    // The amount of tokens Alice wants to place in the deal
+    pub amount_underwritten: u64,
+
+    // The amount of tokens to complete the deal 
+    pub senior_tranche:  u64,  
+
+    // The amount of tokens staked by lp providers
+    pub amount_staked: u64,  
+
+    // 
+    pub amount_to_repay:u64,
     // An enumm that is to represent some kind of state machine
     pub epoch: u8,
 }
 impl DealState {
-    pub const MAX_SIZE:  usize = (4 * 32) + 8 + 8 + 1;
+    pub const MAX_SIZE:  usize = (4 * 32) + 8 + 8 +8 +8 +8+ 1;
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -105,7 +117,7 @@ impl Epochs{
         }
     }
 
-    fn from(val: u8) -> std::result::Result<Epochs, ProgramError> {
+    pub fn from(val: u8) -> std::result::Result<Epochs, ProgramError> {
         match val {
             1 => Ok(Epochs::DealWritten),
             2 => Ok(Epochs::LPCompleted),
