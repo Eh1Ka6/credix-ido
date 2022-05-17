@@ -80,6 +80,9 @@ Solava version  1.10.10
 ## Potential Improvements
 
 - Holding balances in dedicated struct 
+- Implement Events
+- Implement Access Control
+- Implement Time management with anchor_prelude::EpochDuration
 - Some struct use unecessary parameters
 - Security control checks
 - Refactor Unit Tests
