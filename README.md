@@ -23,14 +23,14 @@ Solava version  1.10.10
 
 ## PDA Derivation
 ```Javascript 
-	// links a deal_state to the underwriter, a borrower , a USDC mint , and a timesptamp 
+	// links a deal_state to the underwriter, a borrower , a USDC mint and a timesptamp 
   let [statePubKey, stateBump] = await anchor.web3.PublicKey.findProgramAddress(
     [Buffer.from("state"), underwriter.toBuffer(), borrower.toBuffer(), mint.toBuffer(), uidtoBuffer], program.programId,
   );
 
 	// specify the USDC wallet owned by the Deal Account
   let [walletPubKey, walletBump] = await anchor.web3.PublicKey.findProgramAddress(
-    [Buffer.from("wallet"), alice.toBuffer(), bob.toBuffer(), mint.toBuffer(), uidBuffer], program.programId,
+    [Buffer.from("wallet"), underwriter.toBuffer(), borrower.toBuffer(), mint.toBuffer(), uidBuffer], program.programId,
   );
 	// derives LP token mint 
   let [LpMintPubKey, LpMintBump] = await anchor.web3.PublicKey.findProgramAddress(
@@ -70,13 +70,20 @@ Solava version  1.10.10
     pub fn repay(ctx: Context<Stake>, application_idx: u64, lp_bump: u8, 
 			state_bump:u8 ,wallet_bump: u8,  repayment: u64) {}
 	// Allow the underwriter to redeem his tokens
-pub fn redeemLP_Underwriter () {}
+	pub fn redeemLP_Underwriter () {}
     pub fn redeemLP_Stakers () {}
 	// If the the stake_time to complete the senior tranche expires allow the underwriter 
 	//to withdraw and close the deal after all stakers have withdrawn
-    pub fn Pullback (ctx: Context<Stake>, application_idx: u64, lp_bump: u8, state_bump:u8 ,
-			wallet_bump: u8,  amount: u64) {}
+    pub fn Pullback () {}
 ```
+
+## Potential Improvements
+
+- Holding balances in dedicated struct 
+- Some struct use unecessary parameters
+- Security control checks
+- Refactor Unit Tests
+
 ## Test 
 
 ```
