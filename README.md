@@ -22,6 +22,27 @@ Solava version  1.10.10
 
   ![Execution Flow](/assets/flow_chart.png?raw=true "Execution Flow")
 
+## PDA Derivation
+	``` 
+	// links a deal_state to the underwriter, a borrower , a USDC mint , and a timesptamp 
+  let [statePubKey, stateBump] = await anchor.web3.PublicKey.findProgramAddress(
+    [Buffer.from("state"), underwriter.toBuffer(), borrower.toBuffer(), mint.toBuffer(), uidtoBuffer], program.programId,
+  );
+
+	// specify the USDC wallet owned by the Deal Account
+  let [walletPubKey, walletBump] = await anchor.web3.PublicKey.findProgramAddress(
+    [Buffer.from("wallet"), alice.toBuffer(), bob.toBuffer(), mint.toBuffer(), uidBuffer], program.programId,
+  );
+	// derives LP token mint 
+  let [LpMintPubKey, LpMintBump] = await anchor.web3.PublicKey.findProgramAddress(
+    [Buffer.from(anchor.utils.bytes.utf8.encode("pool-mint"))], program.programId,
+  );
+	// links a deal to n providers
+ let [lproviderPubkey, lproviderBump] = await anchor.web3.PublicKey.findProgramAddress(
+    [Buffer.from("lprovider"), deal.toBuffer(), lprovider.toBuffer(), uidBuffer], program.programId,
+  );
+	```
+
 ## Instructions
 ``` 
 	// Transfer the Underwriter's USDC to a wallet Owned by the current deal
