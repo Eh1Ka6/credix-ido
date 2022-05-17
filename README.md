@@ -80,7 +80,7 @@ Solava version  1.10.10
 ## Potential Improvements
 
 - Holding balances in dedicated struct 
-- Fine tune reward calculation with decimal 
+- Fine tune reward calculation by handling decimals 
 - Implement Events
 - Implement Access Control
 - Implement Time management with anchor_prelude::EpochDuration
