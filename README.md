@@ -70,7 +70,7 @@ Solava version  1.10.10
     pub fn repay(ctx: Context<Stake>, application_idx: u64, lp_bump: u8, 
 			state_bump:u8 ,wallet_bump: u8,  repayment: u64) {}
 	// Allow the underwriter to redeem his tokens
-	pub fn redeemLP_Underwriter () {}
+pub fn redeemLP_Underwriter () {}
     pub fn redeemLP_Stakers () {}
 	// If the the stake_time to complete the senior tranche expires allow the underwriter 
 	//to withdraw and close the deal after all stakers have withdrawn
