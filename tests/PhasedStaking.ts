@@ -271,7 +271,7 @@ it("Creates a member and stake to the escrow wallet", async () => {
 
   console.log(`Initialized a new Deal instance. Alice will pay bob 20 tokens`);
 
-  const tx = await program.methods.createLp(pdaLP.idx, pdaLP.lpBump, pda.stateBump, pda.dealBump).accounts({
+  const tx = await program.methods.createLp(pda.idx, pdaLP.lpBump, pda.stateBump, pda.dealBump).accounts({
     dealState: pda.stateKey,
     underwriter: alice.publicKey,
     borrower: bob.publicKey,
